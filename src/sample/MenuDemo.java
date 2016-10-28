@@ -50,8 +50,13 @@ public class MenuDemo implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         JMenuItem source = (JMenuItem) (e.getSource());
-        String s = "Menu Item source: " + source.getText()
-                + " (an instance of " + getClassName(source) + ")";
+        String s =  source.getText();
+        if(s.contains("Start"))
+        {
+            String s1 = JOptionPane.showInputDialog(frame, "Hello\nWhat's ur name?:");
+            int poolsize = 10 + rnd.nextInt(10);
+            game = new Game(s1, poolsize);
+        }
         jtAreaOutput.append(s + "\n");
         jtAreaOutput.setCaretPosition(jtAreaOutput.getDocument()
                 .getLength());
@@ -85,14 +90,4 @@ public class MenuDemo implements ActionListener {
         frame.pack();
         frame.setVisible(true);
     }
-
-    public static ActionListener buttonListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String s = (String) JOptionPane.showInputDialog(frame, "Hello\nWhat's ur name?:");
-            int poolsize = 10 + rnd.nextInt(10);
-            game = new Game(s, poolsize);
-
-        }
-    };
 }
