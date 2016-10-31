@@ -7,12 +7,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Cell implements ActionListener {
-    public Cell(Pool pool) {
+    public Cell(Pool pool,Player player) {
         setPool(pool);
-        button = new JButton();
+        setPlayer(player);
+        button = new JButton(".");
+        button.setForeground(Color.BLUE);
         button.addActionListener(this);
         setChecked(false);
-        button.setPreferredSize(new Dimension(20, 20));
+        button.setPreferredSize(new Dimension(25, 25));
         button.setMargin(new Insets(0, 0, 0, 0));
     }
 
@@ -30,6 +32,7 @@ public class Cell implements ActionListener {
      */
     private JButton button;
     private Pool pool;
+    private Player player;
 
     /**
      * Invoked when an action occurs.
@@ -38,7 +41,8 @@ public class Cell implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        checkCell();
+        button.setForeground(Color.RED);
     }
 
     public Pool getPool() {
@@ -79,5 +83,50 @@ public class Cell implements ActionListener {
 
     public void setCellID(int cellID) {
         this.cellID = cellID;
+    }
+
+    public void incrementVal() {
+        val++;
+    }
+
+    public void displayValue() {
+        if (val == -1) {
+            button.setText("\u2600");
+           // button.setBackground(Color.RED);
+
+        } else if (val != 0) {
+            //button.setForeground(Color.BLUE);
+            button.setText(String.valueOf(val));
+        }
+    }
+
+    public void checkCell() {
+        button.setEnabled(false);
+        displayValue();
+        isChecked = true;
+        if (val == 0) {
+            pool.scanForEmptyCells();
+            player.incrementScore(val);
+        }
+        if (val == -1) {
+            pool.fail();
+        }
+    }
+
+    public void reveal() {
+        displayValue();
+        button.setEnabled(false);
+    }
+
+    public boolean isEmpty() {
+        return !isChecked() && val == 0;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }

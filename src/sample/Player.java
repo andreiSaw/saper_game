@@ -1,11 +1,12 @@
 package sample;
 
-public class Player {
+public class Player implements java.io.Serializable {
     private String name;
     private int score;
 
     public Player(String name) {
         setName(name);
+        setScore(0);
     }
 
     public String getName() {
@@ -22,5 +23,9 @@ public class Player {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void incrementScore(int x) {
+        score += x;
     }
 }
