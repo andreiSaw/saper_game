@@ -28,4 +28,9 @@ public class Player implements java.io.Serializable {
     public void incrementScore(int x) {
         score += x;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s has %d", getName(),getScore());
+    }
 }

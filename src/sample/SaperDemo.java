@@ -1,10 +1,13 @@
 package sample;
 
-import java.awt.event.*;
-import java.util.Random;
+import org.json.JSONObject;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
 
 
 /**
@@ -24,10 +27,11 @@ public class SaperDemo implements ChangeListener, ActionListener {
     public JMenuBar createJMenuBar() {
         JMenuBar mainMenuBar;
         JMenu menu1;
-        JMenuItem startGameItem, finishGameItem;
+        JMenuItem startGameItem, finishGameItem, topScoreItem;
         mainMenuBar = new JMenuBar();
         menu1 = new JMenu("Main Menu");
         mainMenuBar.add(menu1);
+
         // Creating the MenuItems
         startGameItem = new JMenuItem("Start New Game");
         startGameItem.addActionListener(this);
@@ -36,6 +40,10 @@ public class SaperDemo implements ChangeListener, ActionListener {
         finishGameItem = new JMenuItem("Finish that Game");
         finishGameItem.addActionListener(this);
         menu1.add(finishGameItem);
+
+        topScoreItem = new JMenuItem("Top Scores");
+        topScoreItem.addActionListener(this);
+        menu1.add(topScoreItem);
 
         return mainMenuBar;
     }
@@ -46,11 +54,27 @@ public class SaperDemo implements ChangeListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         JMenuItem source = (JMenuItem) (e.getSource());
         String s = source.getText();
+
         if (s.contains("Start")) {
             startnewgame();
+        } else if (s.contains("Top")) {
+            showScores();
         } else {
             finishgame();
         }
+    }
+
+    /**
+     *
+     */
+    private void showScores() {
+
+    }
+
+    private void appendScore() {
+        JSONObject resultJson = new JSONObject();
+        resultJson.put("name", player.getName());
+        resultJson.put("num", player.getScore());
     }
 
     /**
