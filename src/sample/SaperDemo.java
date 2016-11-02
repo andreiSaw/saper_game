@@ -1,5 +1,6 @@
 package sample;
 
+import com.oracle.javafx.jmx.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -10,8 +11,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
-import java.util.Random;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 
 /**
@@ -23,6 +27,7 @@ public class SaperDemo implements ChangeListener, ActionListener {
     static JFrame frame;
     private static Random rnd = new Random();
     private final String filePath = "res.json";
+    private final int maxTop = 10;
 
     /**
      * Creates menuBar for the app
@@ -86,22 +91,21 @@ public class SaperDemo implements ChangeListener, ActionListener {
             JSONArray jsonArray = (JSONArray) obj;
 
             return jsonArray;
-        } catch (FileNotFoundException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+            createNewFile(new File(filePath));
+            return new JSONArray();
         }
-        return null;
     }
 
     /**
      *
      */
     private void showScores() {
-        // JSONArray jsonArray=  parseObjectsFromFile();
-
+         JSONArray jsonArray=  parseObjectsFromFile();
+        //TODO WHATS NEXT?
+        //TODO separate while loop
+        //TODO create dialog
     }
 
     /**
@@ -112,6 +116,11 @@ public class SaperDemo implements ChangeListener, ActionListener {
         JSONObject resultObj = new JSONObject();
         resultObj.put("name", player.getName());
         resultObj.put("score", player.getScore());
+
+        jsonArray = sortJsonArray(jsonArray);
+        while (jsonArray.size() >= maxTop) {
+            jsonArray.remove(0);
+        }
         jsonArray.add(resultObj);
         try {
             checkIfFileEx();
@@ -125,17 +134,61 @@ public class SaperDemo implements ChangeListener, ActionListener {
         }
     }
 
+    /**
+     * @return
+     */
     private boolean checkIfFileEx() {
         File f = new File(filePath);
-        if ((!f.exists())||f.length()==0) {
-            try {
-                f.createNewFile();
-                return false;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if ((!f.exists()) || f.length() == 0) {
+            createNewFile(f);
         }
         return true;
+    }
+
+    private void createNewFile(File f) {
+        try {
+            f.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private JSONArray sortJsonArray(JSONArray jsonArray) {
+
+        JSONArray sortedJsonArray = new JSONArray();
+
+        List<JSONObject> jsonValues = new ArrayList<>();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            jsonValues.add((JSONObject) jsonArray.get(i));
+        }
+        Collections.sort(jsonValues, new Comparator<JSONObject>() {
+
+            private static final String KEY_NAME = "score";
+
+            @Override
+            public int compare(JSONObject a, JSONObject b) {
+                int valA = 0;
+                int valB = 0;
+
+                try {
+
+                    valA =  Integer.parseInt(String.valueOf(a.get(KEY_NAME)));
+                    valB =  Integer.parseInt(String.valueOf(b.get(KEY_NAME)));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                return Integer.compare(valA,valB);
+                //if you want to change the sort order, simply use the following:
+                //return -valA.compareTo(valB);
+            }
+        });
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            sortedJsonArray.add(jsonValues.get(i));
+        }
+        return sortedJsonArray;
     }
 
     /**
@@ -161,20 +214,9 @@ public class SaperDemo implements ChangeListener, ActionListener {
     }
 
     /**
-     * @param o Object
-     * @return String the class name, no package info
-     */
-
-    protected String getClassName(Object o) {
-        String classString = o.getClass().getName();
-        int dotIndex = classString.lastIndexOf(".");
-        return classString.substring(dotIndex + 1); // Returns only Class name
-    }
-
-    /**
      * The entry point
      *
-     * @param args
+     * @param args standard
      */
     public static void main(String[] args) {
 
