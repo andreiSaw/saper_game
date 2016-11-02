@@ -3,12 +3,14 @@ package sample;
 import java.awt.event.*;
 import java.util.Random;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 /**
  * Main class, the entry point here
  */
-public class SaperDemo implements ActionListener {
+public class SaperDemo implements ChangeListener, ActionListener {
     Pool pool;
     Player player;
     static JFrame frame;
@@ -51,15 +53,24 @@ public class SaperDemo implements ActionListener {
         }
     }
 
+    /**
+     *
+     */
     public void startnewgame() {
         String s1 = JOptionPane.showInputDialog(frame, "Hello\nWhat's ur name?:");
         int poolsize = 10 + rnd.nextInt(10);
+
         player = new Player(s1);
-        pool = new Pool(frame, poolsize,player);
+        pool = new Pool(frame, poolsize, player, this);
     }
 
+    /**
+     *
+     */
     public void finishgame() {
-        pool.fail();
+        if (pool != null) {
+            pool.revealPool();
+        }
     }
 
     /**
@@ -97,5 +108,15 @@ public class SaperDemo implements ActionListener {
 
         //frame.pack();
         frame.setVisible(true);
+    }
+
+    /**
+     * Invoked when the target of the listener has changed its state.
+     *
+     * @param e a ChangeEvent object
+     */
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        finishgame();
     }
 }

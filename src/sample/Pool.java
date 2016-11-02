@@ -11,6 +11,9 @@ public class Pool {
     private Cell[][] cells;
     private JFrame frame;
     private Player player;
+    private int qCells;
+    private int qMines;
+    private SaperDemo mainGame;
 
 
     /**
@@ -20,8 +23,11 @@ public class Pool {
      * @param poolSize
      * @param player
      */
-    public Pool(JFrame frame, int poolSize, Player player) {
+    public Pool(JFrame frame, int poolSize, Player player, SaperDemo g) {
         setPoolSize(poolSize);
+        setMainGame(g);
+        qCells=poolSize*poolSize;
+        qMines=poolSize;
         this.player = player;
         setFrame(frame);
         frame.setContentPane(makeGrid());
@@ -95,7 +101,7 @@ public class Pool {
         ArrayList<Integer> loc = new ArrayList<>();
         int random;
         for (int i = 0; i < q; ) {
-            random = (int) (Math.random() * (poolSize * poolSize));
+            random = (int) (Math.random() * (poolSize*poolSize));
             if (!loc.contains(random)) {
                 loc.add(random);
                 i++;
@@ -123,6 +129,14 @@ public class Pool {
      * if player failed
      */
     public void fail() {
+        revealPool();
+        JOptionPane.showMessageDialog(frame,
+                "You lose! Your score "+player.getScore());
+        mainGame.finishgame();
+    }
+
+    public void revealPool()
+    {
         for (Cell[] a : cells) {
             for (Cell b : a) {
                 b.reveal();
@@ -171,5 +185,26 @@ public class Pool {
                 }
             }
         }
+    }
+
+    /**
+     * @param qCells
+     */
+    public void decremqCells(int qCells) {
+        this.qCells -= qCells;
+        if(this.qCells==0||this.qMines==this.qCells)
+        {
+            JOptionPane.showMessageDialog(frame,
+                    "You win! Your score "+player.getScore());
+            mainGame.finishgame();
+        }
+    }
+
+    public void incrementScore(int val) {
+        player.incrementScore(val);
+    }
+
+    public void setMainGame(SaperDemo mainGame) {
+        this.mainGame = mainGame;
     }
 }

@@ -7,14 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Cell implements ActionListener {
-    public Cell(Pool pool,Player player) {
+    public Cell(Pool pool, Player player) {
         setPool(pool);
-        setPlayer(player);
-        button = new JButton(".");
+        //setPlayer(player);
+        button = new JButton("o");
         button.setForeground(Color.BLUE);
         button.addActionListener(this);
         setChecked(false);
-        button.setPreferredSize(new Dimension(25, 25));
+        int btnSize = 50;
+        button.setPreferredSize(new Dimension(btnSize, btnSize));
         button.setMargin(new Insets(0, 0, 0, 0));
     }
 
@@ -32,7 +33,7 @@ public class Cell implements ActionListener {
      */
     private JButton button;
     private Pool pool;
-    private Player player;
+    //private Player player;
 
     /**
      * Invoked when an action occurs.
@@ -42,7 +43,6 @@ public class Cell implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         checkCell();
-        button.setForeground(Color.RED);
     }
 
     public Pool getPool() {
@@ -85,48 +85,59 @@ public class Cell implements ActionListener {
         this.cellID = cellID;
     }
 
+    /**
+     *
+     */
     public void incrementVal() {
         val++;
     }
 
-    public void displayValue() {
+    /**
+     *
+     */
+    public int displayValue() {
         if (val == -1) {
-            button.setText("\u2600");
-           // button.setBackground(Color.RED);
-
+            button.setText("!");
+            button.setForeground(Color.RED);
         } else if (val != 0) {
-            //button.setForeground(Color.BLUE);
             button.setText(String.valueOf(val));
+            button.setForeground(Color.BLUE);
         }
+        return val;
     }
 
+    /**
+     *
+     */
     public void checkCell() {
-        button.setEnabled(false);
+        pool.decremqCells(1);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
         displayValue();
         isChecked = true;
         if (val == 0) {
             pool.scanForEmptyCells();
-            player.incrementScore(val);
+            return;
         }
         if (val == -1) {
             pool.fail();
         }
+        pool.incrementScore(val);
     }
 
-    public void reveal() {
-        displayValue();
-        button.setEnabled(false);
+    /**
+     *
+     */
+    public int reveal() {
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        return displayValue();
     }
 
+    /**
+     * @return
+     */
     public boolean isEmpty() {
         return !isChecked() && val == 0;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
     }
 }
