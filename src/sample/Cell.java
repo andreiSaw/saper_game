@@ -19,6 +19,11 @@ public class Cell implements ActionListener {
         button.setMargin(new Insets(0, 0, 0, 0));
     }
 
+    public void disable()
+    {
+        button.removeActionListener(this);
+    }
+
     private int cellID;
     /**
      * value stands -1 for mine, 0 stands for 0 mines, etc.
@@ -117,6 +122,7 @@ public class Cell implements ActionListener {
         isChecked = true;
         if (val == 0) {
             pool.scanForEmptyCells();
+            pool.incrementScore(1);
             return;
         }
         if (val == -1) {

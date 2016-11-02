@@ -3,8 +3,6 @@
     <output-path>$PROJECT_DIR$/out/artifacts/saper_jar</output-path>
     <root id="archive" name="saper.jar">
       <element id="module-output" name="saper" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/json-20140107.jar" path-in-jar="/" />
-      <element id="library" level="project" name="org.json" />
     </root>
   </artifact>
 </component>

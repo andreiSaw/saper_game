@@ -26,8 +26,8 @@ public class Pool {
     public Pool(JFrame frame, int poolSize, Player player, SaperDemo g) {
         setPoolSize(poolSize);
         setMainGame(g);
-        qCells=poolSize*poolSize;
-        qMines=poolSize;
+        qCells = poolSize * poolSize;
+        qMines = poolSize;
         this.player = player;
         setFrame(frame);
         frame.setContentPane(makeGrid());
@@ -82,7 +82,7 @@ public class Pool {
 
 
     /**
-     *
+     * http://codereview.stackexchange.com/questions/88636/beginner-minesweeper-game
      */
     private void setMinesLocation() {
         ArrayList<Integer> loc = generateMinesLocation(poolSize);
@@ -93,6 +93,8 @@ public class Pool {
 
     /**
      * Choose random places for mines
+     * <p>
+     * http://codereview.stackexchange.com/questions/88636/beginner-minesweeper-game
      *
      * @param q
      * @return
@@ -101,7 +103,7 @@ public class Pool {
         ArrayList<Integer> loc = new ArrayList<>();
         int random;
         for (int i = 0; i < q; ) {
-            random = (int) (Math.random() * (poolSize*poolSize));
+            random = (int) (Math.random() * (poolSize * poolSize));
             if (!loc.contains(random)) {
                 loc.add(random);
                 i++;
@@ -131,12 +133,11 @@ public class Pool {
     public void fail() {
         revealPool();
         JOptionPane.showMessageDialog(frame,
-                "You lose! Your score "+player.getScore());
+                "You lose! Your score " + player.getScore());
         mainGame.finishgame();
     }
 
-    public void revealPool()
-    {
+    public void revealPool() {
         for (Cell[] a : cells) {
             for (Cell b : a) {
                 b.reveal();
@@ -147,6 +148,8 @@ public class Pool {
 
     /**
      * This method count number of mines around particular cell and set its value
+     * <p>
+     * http://codereview.stackexchange.com/questions/88636/beginner-minesweeper-game
      */
     public void setCellValues() {
         for (int i = 0; i < poolSize; i++) {
@@ -169,6 +172,8 @@ public class Pool {
      * This method starts chain reaction. When user click on particular cell, if cell is empty (value = 0) this
      * method look for other empty cells next to activated one. If finds one, it call checkCell and in effect,
      * start next scan on its closest area
+     * <p>
+     * http://codereview.stackexchange.com/questions/88636/beginner-minesweeper-game
      */
     public void scanForEmptyCells() {
         for (int i = 0; i < poolSize; i++) {
@@ -192,19 +197,29 @@ public class Pool {
      */
     public void decremqCells(int qCells) {
         this.qCells -= qCells;
-        if(this.qCells==0||this.qMines==this.qCells)
-        {
+        if (this.qMines == this.qCells) {
             JOptionPane.showMessageDialog(frame,
-                    "You win! Your score "+player.getScore());
+                    "You win! Your score " + player.getScore());
             mainGame.finishgame();
         }
     }
 
+    /**
+     * @param val
+     */
     public void incrementScore(int val) {
         player.incrementScore(val);
     }
 
     public void setMainGame(SaperDemo mainGame) {
         this.mainGame = mainGame;
+    }
+
+    public void disablePool() {
+        for (Cell[] a : cells) {
+            for (Cell b : a) {
+                b.disable();
+            }
+        }
     }
 }

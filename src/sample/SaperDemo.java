@@ -1,12 +1,16 @@
 package sample;
 
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.util.Random;
 
 
@@ -18,6 +22,7 @@ public class SaperDemo implements ChangeListener, ActionListener {
     Player player;
     static JFrame frame;
     private static Random rnd = new Random();
+    private final String filePath = "res.json";
 
     /**
      * Creates menuBar for the app
@@ -65,16 +70,72 @@ public class SaperDemo implements ChangeListener, ActionListener {
     }
 
     /**
+     * http://stackoverflow.com/questions/18831948/how-parsing-jsonarray-in-java-with-json-simple
+     *
+     * @return
+     */
+    private JSONArray parseObjectsFromFile() {
+        JSONParser parser = new JSONParser();
+
+        try {
+            if (!checkIfFileEx()) {
+                return new JSONArray();
+            }
+            Object obj = parser.parse(new FileReader(filePath));
+
+            JSONArray jsonArray = (JSONArray) obj;
+
+            return jsonArray;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      *
      */
     private void showScores() {
+        // JSONArray jsonArray=  parseObjectsFromFile();
 
     }
 
+    /**
+     *
+     */
     private void appendScore() {
-        JSONObject resultJson = new JSONObject();
-        resultJson.put("name", player.getName());
-        resultJson.put("num", player.getScore());
+        JSONArray jsonArray = parseObjectsFromFile();
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("name", player.getName());
+        resultObj.put("score", player.getScore());
+        jsonArray.add(resultObj);
+        try {
+            checkIfFileEx();
+            FileWriter file = new FileWriter(filePath);
+            file.write(String.valueOf(jsonArray));
+            file.flush();
+            file.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean checkIfFileEx() {
+        File f = new File(filePath);
+        if ((!f.exists())||f.length()==0) {
+            try {
+                f.createNewFile();
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
     }
 
     /**
@@ -94,6 +155,8 @@ public class SaperDemo implements ChangeListener, ActionListener {
     public void finishgame() {
         if (pool != null) {
             pool.revealPool();
+            pool.disablePool();
+            appendScore();
         }
     }
 
