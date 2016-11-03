@@ -106,6 +106,8 @@ public class Cell implements ActionListener {
         } else if (val != 0) {
             button.setText(String.valueOf(val));
             button.setForeground(Color.BLUE);
+        } else {
+            button.setText("");
         }
         return val;
     }
@@ -116,19 +118,19 @@ public class Cell implements ActionListener {
     public void checkCell() {
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        displayValue();
 
         if (val == 0) {
             pool.scanCells(pool.getCellLoc(getCellID()));
-            pool.incrementScore(1);
             return;
-        }
-        if (val == -1) {
+        } else if (val == -1) {
             pool.fail();
+        } else {
+            pool.incrementScore(val + 1);
         }
-
-        pool.decremqCells(1);
-        pool.incrementScore(val);
+        reveal();
+        if (pool.checkQ()) {
+            pool.finishGame();
+        }
     }
 
     /**
@@ -137,13 +139,10 @@ public class Cell implements ActionListener {
     public int reveal() {
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        return displayValue();
-    }
+        pool.decremqCells(1);
 
-    /**
-     * @return
-     */
-    public boolean isEmpty() {
-        return !isChecked() && val == 0;
+        setChecked(true);
+        disable();
+        return displayValue();
     }
 }

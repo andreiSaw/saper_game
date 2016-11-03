@@ -102,7 +102,7 @@ public class SaperDemo implements ChangeListener, ActionListener {
      *
      */
     private void showScores() {
-         JSONArray jsonArray=  parseObjectsFromFile();
+        JSONArray jsonArray = parseObjectsFromFile();
         //TODO WHATS NEXT?
         //TODO separate while loop
         //TODO create dialog
@@ -172,14 +172,14 @@ public class SaperDemo implements ChangeListener, ActionListener {
 
                 try {
 
-                    valA =  Integer.parseInt(String.valueOf(a.get(KEY_NAME)));
-                    valB =  Integer.parseInt(String.valueOf(b.get(KEY_NAME)));
+                    valA = Integer.parseInt(String.valueOf(a.get(KEY_NAME)));
+                    valB = Integer.parseInt(String.valueOf(b.get(KEY_NAME)));
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                return Integer.compare(valA,valB);
+                return Integer.compare(valA, valB);
                 //if you want to change the sort order, simply use the following:
                 //return -valA.compareTo(valB);
             }

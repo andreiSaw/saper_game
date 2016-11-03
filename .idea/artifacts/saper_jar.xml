@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="saper:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/saper_jar</output-path>
-    <root id="archive" name="saper.jar">
-      <element id="module-output" name="saper" />
-    </root>
-  </artifact>
-</component>

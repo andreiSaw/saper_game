@@ -27,7 +27,8 @@ public class Pool {
         setPoolSize(poolSize);
         setMainGame(g);
         qCells = poolSize * poolSize;
-        qMines = 2*poolSize;
+        qMines = 2 * poolSize
+        ;
         this.player = player;
         setFrame(frame);
         frame.setContentPane(makeGrid());
@@ -131,10 +132,10 @@ public class Pool {
      * if player failed
      */
     public void fail() {
-        revealPool();
+        mainGame.finishgame();
         JOptionPane.showMessageDialog(frame,
                 "You lose! Your score " + player.getScore());
-        mainGame.finishgame();
+
     }
 
     /**
@@ -180,10 +181,8 @@ public class Pool {
         if (cells[p.x][p.y].isChecked()) {
             return;
         }
-        cells[p.x][p.y].setChecked(true);
         cells[p.x][p.y].reveal();
-        incrementScore(1);
-        decremqCells(1);
+        incrementScore(cells[p.x][p.y].getVal() + 1);
 
         if (cells[p.x][p.y].getVal() != 0) {
             return;
@@ -226,11 +225,6 @@ public class Pool {
      */
     public void decremqCells(int qCells) {
         this.qCells -= qCells;
-        if (this.qMines == this.qCells) {
-            JOptionPane.showMessageDialog(frame,
-                    "You win! Your score " + player.getScore());
-            mainGame.finishgame();
-        }
     }
 
     /**
@@ -250,5 +244,15 @@ public class Pool {
                 b.disable();
             }
         }
+    }
+
+    public boolean checkQ() {
+        return (this.qMines == this.qCells);
+    }
+
+    public void finishGame() {
+        mainGame.finishgame();
+        JOptionPane.showMessageDialog(frame,
+                "You win! Your score " + player.getScore());
     }
 }
