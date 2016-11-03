@@ -9,6 +9,16 @@ public class Player implements java.io.Serializable {
         setScore(0);
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param sourcePlayer
+     */
+    public Player(Player sourcePlayer) {
+        setName(sourcePlayer.getName());
+        setScore(sourcePlayer.getScore());
+    }
+
     public String getName() {
         return name;
     }
@@ -31,6 +41,6 @@ public class Player implements java.io.Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s has %d", getName(),getScore());
+        return String.format("%s has %d", getName(), getScore());
     }
 }

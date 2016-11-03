@@ -4,10 +4,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Pool is where all cells are placed
+ */
 public class Pool {
+    /**
+     * The size of pool
+     */
     private int poolSize = -1;
     private int limit;
     private int cellID = 0;
+    /**
+     * Inner conception
+     */
     private Cell[][] cells;
     private JFrame frame;
     private Player player;
@@ -26,18 +35,32 @@ public class Pool {
     public Pool(JFrame frame, int poolSize, Player player, SaperDemo g) {
         setPoolSize(poolSize);
         setMainGame(g);
-        qCells = poolSize * poolSize;
-        qMines = 2 * poolSize
-        ;
-        this.player = player;
+        setqCells(poolSize * poolSize);
+        setqMines(2 * poolSize);
+        this.setPlayer(player);
         setFrame(frame);
         frame.setContentPane(makeGrid());
-        limit = poolSize - 2;
+        setLimit(poolSize - 2);
         setMinesLocation();
         setCellValues();
         frame.pack();
     }
 
+    /*
+        public Pool(Pool sourcePool) {
+            setPoolSize(sourcePool.getPoolSize());
+            setMainGame(sourcePool.getMainGame());
+            setqCells(sourcePool.getqCells());
+            setqMines(sourcePool.getqMines());
+            setPlayer(new Player(sourcePool.getPlayer()));
+            setFrame(sourcePool.getFrame());
+            setLimit(sourcePool.getLimit());
+            cells=new Cell[poolSize][poolSize];
+            copyCells(sourcePool.getCells());
+            setCellID(sourcePool.getCellID());
+            frame.pack();
+        }
+    */
     public int getPoolSize() {
         return poolSize;
     }
@@ -56,7 +79,7 @@ public class Pool {
         cells = new Cell[poolSize][poolSize];
         for (int i = 0; i < poolSize; i++) {
             for (int j = 0; j < poolSize; j++) {
-                cells[i][j] = new Cell(this, player);
+                cells[i][j] = new Cell(this);
                 cells[i][j].setCellID(getID());
                 panel.add(cells[i][j].getButton());
             }
@@ -68,11 +91,18 @@ public class Pool {
      * @return
      */
     public int getID() {
-        int id = cellID;
-        cellID++;
+        int id = getCellID();
+        setCellID(getCellID() + 1);
         return id;
     }
 
+    protected Cell[][] getCells() {
+        return cells;
+    }
+
+    /**
+     * JFrame
+     */
     public JFrame getFrame() {
         return frame;
     }
@@ -86,7 +116,7 @@ public class Pool {
      * http://codereview.stackexchange.com/questions/88636/beginner-minesweeper-game
      */
     private void setMinesLocation() {
-        ArrayList<Integer> loc = generateMinesLocation(qMines);
+        ArrayList<Integer> loc = generateMinesLocation(getqMines());
         for (int i : loc) {
             getCell(i).setVal(-1);
         }
@@ -97,8 +127,8 @@ public class Pool {
      * <p>
      * http://codereview.stackexchange.com/questions/88636/beginner-minesweeper-game
      *
-     * @param q
-     * @return
+     * @param q int represents quanity of mines
+     * @return list of mines location
      */
     public ArrayList<Integer> generateMinesLocation(int q) {
         ArrayList<Integer> loc = new ArrayList<>();
@@ -114,8 +144,10 @@ public class Pool {
     }
 
     /**
-     * @param id
-     * @return
+     * Method returns cell's instance by his ID
+     *
+     * @param id cellID
+     * @return cell's instance
      */
     public Cell getCell(int id) {
         for (Cell[] a : cells) {
@@ -132,14 +164,11 @@ public class Pool {
      * if player failed
      */
     public void fail() {
-        mainGame.finishgame();
-        JOptionPane.showMessageDialog(frame,
-                "You lose! Your score " + player.getScore());
-
+        getMainGame().finishAndShow("lose");
     }
 
     /**
-     *
+     * Method opens whole Poll
      */
     public void revealPool() {
         for (Cell[] a : cells) {
@@ -196,7 +225,6 @@ public class Pool {
                     scanCells(p1);
             }
         }
-
     }
 
     /**
@@ -224,7 +252,7 @@ public class Pool {
      * @param qCells
      */
     public void decremqCells(int qCells) {
-        this.qCells -= qCells;
+        this.setqCells(this.getqCells() - qCells);
     }
 
     /**
@@ -247,12 +275,81 @@ public class Pool {
     }
 
     public boolean checkQ() {
-        return (this.qMines == this.qCells);
+        return (this.getqMines() == this.getqCells());
     }
 
     public void finishGame() {
-        mainGame.finishgame();
-        JOptionPane.showMessageDialog(frame,
-                "You win! Your score " + player.getScore());
+        getMainGame().finishAndShow("win");
+    }
+
+    /**
+     * int represents Quanity of cells on Pool
+     */
+    public int getqCells() {
+        return qCells;
+    }
+
+    /**
+     * Represents SaperDemo instance
+     */
+    public SaperDemo getMainGame() {
+        return mainGame;
+    }
+
+    public void setqCells(int qCells) {
+        this.qCells = qCells;
+    }
+
+    /**
+     * int represents Quanity of mines on Pool
+     */
+    public int getqMines() {
+        return qMines;
+    }
+
+    public void setqMines(int qMines) {
+        this.qMines = qMines;
+    }
+
+    /**
+     * Player
+     */
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    /**
+     * Inner bound
+     */
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+/*
+    public void copyCells(Cell[][] sourceCells) {
+        for (int i = 0; i < getPoolSize(); i++) {
+            for (int j = 0; j < getPoolSize(); j++) {
+                cells[i][j] = new Cell(sourceCells[i][j]);
+            }
+        }
+    }
+    */
+
+    /**
+     * inner conception of enumeration
+     */
+    public int getCellID() {
+        return cellID;
+    }
+
+    public void setCellID(int cellID) {
+        this.cellID = cellID;
     }
 }

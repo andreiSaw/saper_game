@@ -27,7 +27,6 @@ public class SaperDemo implements ChangeListener, ActionListener {
     static JFrame frame;
     private static Random rnd = new Random();
     private final String filePath = "res.json";
-    private final int maxTop = 10;
 
     /**
      * Creates menuBar for the app
@@ -36,11 +35,13 @@ public class SaperDemo implements ChangeListener, ActionListener {
      */
     public JMenuBar createJMenuBar() {
         JMenuBar mainMenuBar;
-        JMenu menu1;
-        JMenuItem startGameItem, finishGameItem, topScoreItem;
+        JMenu menu1, menu2;
+        JMenuItem startGameItem, finishGameItem, topScoreItem, resetScoresItems;
         mainMenuBar = new JMenuBar();
         menu1 = new JMenu("Main Menu");
+        menu2 = new JMenu("Score");
         mainMenuBar.add(menu1);
+        mainMenuBar.add(menu2);
 
         // Creating the MenuItems
         startGameItem = new JMenuItem("Start New Game");
@@ -51,15 +52,21 @@ public class SaperDemo implements ChangeListener, ActionListener {
         finishGameItem.addActionListener(this);
         menu1.add(finishGameItem);
 
-        topScoreItem = new JMenuItem("Top Scores");
+        topScoreItem = new JMenuItem("Top scores");
         topScoreItem.addActionListener(this);
-        menu1.add(topScoreItem);
+        menu2.add(topScoreItem);
+
+        resetScoresItems = new JMenuItem("Reset scores");
+        resetScoresItems.addActionListener(this);
+        menu2.add(resetScoresItems);
 
         return mainMenuBar;
     }
 
     /**
-     * @param e
+     * Method to listen actions with menuBar
+     *
+     * @param e standard
      */
     public void actionPerformed(ActionEvent e) {
         JMenuItem source = (JMenuItem) (e.getSource());
@@ -69,15 +76,36 @@ public class SaperDemo implements ChangeListener, ActionListener {
             startnewgame();
         } else if (s.contains("Top")) {
             showScores();
-        } else {
-            finishgame();
+        } else if (s.contains("Finish")) {
+            finishAndShow("finished");
+        } else if (s.contains("Reset")) {
+            resetScores();
         }
     }
 
     /**
+     * Deletes all score from scoreFile
+     */
+    private void resetScores() {
+        try {
+            checkIfFileEx();
+            FileWriter file = new FileWriter(filePath);
+            file.write(String.valueOf(new JSONArray()));
+            file.flush();
+            file.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Failed!", "Message", JOptionPane.INFORMATION_MESSAGE);
+        }
+        JOptionPane.showMessageDialog(frame, "Successful!", "Message", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Method parse jsonObjects from file
      * http://stackoverflow.com/questions/18831948/how-parsing-jsonarray-in-java-with-json-simple
      *
-     * @return
+     * @return parsed array of jsonObjects
      */
     private JSONArray parseObjectsFromFile() {
         JSONParser parser = new JSONParser();
@@ -88,9 +116,7 @@ public class SaperDemo implements ChangeListener, ActionListener {
             }
             Object obj = parser.parse(new FileReader(filePath));
 
-            JSONArray jsonArray = (JSONArray) obj;
-
-            return jsonArray;
+            return (JSONArray) obj;
         } catch (IOException | ParseException e) {
             e.printStackTrace();
             createNewFile(new File(filePath));
@@ -99,17 +125,32 @@ public class SaperDemo implements ChangeListener, ActionListener {
     }
 
     /**
-     *
+     * Method provides user top scores
      */
     private void showScores() {
-        JSONArray jsonArray = parseObjectsFromFile();
-        //TODO WHATS NEXT?
-        //TODO separate while loop
-        //TODO create dialog
+        JOptionPane.showMessageDialog(frame, new JScrollPane(getScoreTable()), "Top scores", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
-     *
+     * @return
+     */
+    private JTable getScoreTable() {
+        JSONArray jsonArray = parseObjectsFromFile();
+        int n = jsonArray.size();
+        Object[][] data = new Object[n][2];
+        Object[] colNames;
+        colNames = new Object[]{"Name", "Score"};
+        for (int i = 0; i < n; i++) {
+            JSONObject jsonObject =
+                    (JSONObject) jsonArray.get(i);
+            data[i][0] = jsonObject.get("name");
+            data[i][1] = jsonObject.get("score");
+        }
+        return new JTable(data, colNames);
+    }
+
+    /**
+     * Method appends a scoreFile with new entries
      */
     private void appendScore() {
         JSONArray jsonArray = parseObjectsFromFile();
@@ -117,11 +158,13 @@ public class SaperDemo implements ChangeListener, ActionListener {
         resultObj.put("name", player.getName());
         resultObj.put("score", player.getScore());
 
+        jsonArray.add(resultObj);
         jsonArray = sortJsonArray(jsonArray);
+        int maxTop = 10;
         while (jsonArray.size() >= maxTop) {
             jsonArray.remove(0);
         }
-        jsonArray.add(resultObj);
+
         try {
             checkIfFileEx();
             FileWriter file = new FileWriter(filePath);
@@ -135,7 +178,7 @@ public class SaperDemo implements ChangeListener, ActionListener {
     }
 
     /**
-     * @return
+     * @return true if file exists, false - otherwise
      */
     private boolean checkIfFileEx() {
         File f = new File(filePath);
@@ -153,6 +196,12 @@ public class SaperDemo implements ChangeListener, ActionListener {
         }
     }
 
+    /**
+     * Sorts JSONArray
+     *
+     * @param jsonArray source arr
+     * @return sorted arr
+     */
     private JSONArray sortJsonArray(JSONArray jsonArray) {
 
         JSONArray sortedJsonArray = new JSONArray();
@@ -180,8 +229,6 @@ public class SaperDemo implements ChangeListener, ActionListener {
                 }
 
                 return Integer.compare(valA, valB);
-                //if you want to change the sort order, simply use the following:
-                //return -valA.compareTo(valB);
             }
         });
 
@@ -192,7 +239,7 @@ public class SaperDemo implements ChangeListener, ActionListener {
     }
 
     /**
-     *
+     * Method to start a new game
      */
     public void startnewgame() {
         String s1 = JOptionPane.showInputDialog(frame, "Hello\nWhat's ur name?:");
@@ -202,8 +249,18 @@ public class SaperDemo implements ChangeListener, ActionListener {
         pool = new Pool(frame, poolsize, player, this);
     }
 
+    public void startnewgameLastPool() {
+        String s1 = JOptionPane.showInputDialog(frame, "Hello\nWhat's ur name?:");
+
+        player = new Player(s1);
+        int poolSize=pool.getPoolSize();
+        pool = new Pool(frame,poolSize,player,this);
+
+    }
+
+
     /**
-     *
+     * Method to finish current game
      */
     public void finishgame() {
         if (pool != null) {
@@ -247,5 +304,39 @@ public class SaperDemo implements ChangeListener, ActionListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         finishgame();
+    }
+
+    protected void showFinal(String res) {
+        String[] choices = {"Start new Game", "Re-run that Game", "Finish"};
+        int response = JOptionPane.showOptionDialog(frame, new JScrollPane(getScoreTable()),
+                String.format("You %s! Your score %d", res, player.getScore()), JOptionPane.YES_NO_OPTION
+                , JOptionPane.PLAIN_MESSAGE, null, choices, "None of your business");
+        switch (response) {
+            case 0:
+                startnewgame();
+                break;
+            case 1:
+                startnewgameLastPool();
+                break;
+            case 2:
+                finishgame();
+                break;
+        }
+    }
+    protected void finishAndShow(String res)
+    {
+        if (pool==null||pool.getqCells()<=0)
+        {
+            return;
+        }
+        Thread t1 = new Thread(() -> {
+            finishgame();
+        });
+        Thread t2 = new Thread(() -> {
+            showFinal(res);
+        });
+        //to run in the main thread not different
+        t1.run();
+        t2.run();
     }
 }

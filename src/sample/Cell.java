@@ -7,19 +7,42 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Cell implements ActionListener {
-    public Cell(Pool pool, Player player) {
+    private int btnSize = 50;
+    private int inset=0;
+    /**
+     * @param pool
+     */
+    public Cell(Pool pool) {
         setPool(pool);
-        //setPlayer(player);
         button = new JButton("o");
         button.setForeground(Color.BLUE);
         button.addActionListener(this);
         setChecked(false);
-        int btnSize = 50;
-        button.setPreferredSize(new Dimension(btnSize, btnSize));
-        button.setMargin(new Insets(0, 0, 0, 0));
-    }
 
+        button.setPreferredSize(new Dimension(getBtnSize(), getBtnSize()));
+        button.setMargin(new Insets(getInset(), getInset(), getInset(), getInset()));
+    }
+    /*
+    public Cell(Cell sourceCell)
+    {
+        Pool clonnedPool=new Pool(sourceCell.getPool());
+        setPool(clonnedPool);
+        button=new JButton(String.valueOf(sourceCell.getVal()));
+        button.setForeground(sourceCell.button.getForeground());
+        button.addActionListener(this);
+        setChecked(sourceCell.isChecked());
+        int btnsize=sourceCell.getBtnSize();
+        button.setPreferredSize(new Dimension(btnsize,btnsize));
+        int inset=sourceCell.getInset();
+        button.setMargin(new Insets(inset, inset, inset, inset));
+    }
+*/
+    /**
+     * Makes cell inaccessible
+     */
     public void disable() {
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
         button.removeActionListener(this);
     }
 
@@ -36,13 +59,15 @@ public class Cell implements ActionListener {
      * internal conception
      */
     private JButton button;
+    /**
+     * Game pool
+     */
     private Pool pool;
-    //private Player player;
 
     /**
      * Invoked when an action occurs.
      *
-     * @param e
+     * @param e ActionEvent
      */
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -90,14 +115,14 @@ public class Cell implements ActionListener {
     }
 
     /**
-     *
+     * Increment cell value
      */
     public void incrementVal() {
         val++;
     }
 
     /**
-     *
+     * Directly shows cell's value
      */
     public int displayValue() {
         if (val == -1) {
@@ -113,12 +138,9 @@ public class Cell implements ActionListener {
     }
 
     /**
-     *
+     * Method checking cell and neighbours
      */
     public void checkCell() {
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-
         if (val == 0) {
             pool.scanCells(pool.getCellLoc(getCellID()));
             return;
@@ -134,15 +156,21 @@ public class Cell implements ActionListener {
     }
 
     /**
-     *
+     * Method makes cell inaccessible and show value of cell
      */
     public int reveal() {
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
         pool.decremqCells(1);
 
         setChecked(true);
         disable();
         return displayValue();
+    }
+
+    public int getBtnSize() {
+        return btnSize;
+    }
+
+    public int getInset() {
+        return inset;
     }
 }
