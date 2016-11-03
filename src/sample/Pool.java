@@ -27,7 +27,7 @@ public class Pool {
         setPoolSize(poolSize);
         setMainGame(g);
         qCells = poolSize * poolSize;
-        qMines = poolSize;
+        qMines = 2*poolSize;
         this.player = player;
         setFrame(frame);
         frame.setContentPane(makeGrid());
@@ -85,7 +85,7 @@ public class Pool {
      * http://codereview.stackexchange.com/questions/88636/beginner-minesweeper-game
      */
     private void setMinesLocation() {
-        ArrayList<Integer> loc = generateMinesLocation(poolSize);
+        ArrayList<Integer> loc = generateMinesLocation(qMines);
         for (int i : loc) {
             getCell(i).setVal(-1);
         }
@@ -137,6 +137,9 @@ public class Pool {
         mainGame.finishgame();
     }
 
+    /**
+     *
+     */
     public void revealPool() {
         for (Cell[] a : cells) {
             for (Cell b : a) {
@@ -172,24 +175,50 @@ public class Pool {
      * This method starts chain reaction. When user click on particular cell, if cell is empty (value = 0) this
      * method look for other empty cells next to activated one. If finds one, it call checkCell and in effect,
      * start next scan on its closest area
-     * <p>
-     * http://codereview.stackexchange.com/questions/88636/beginner-minesweeper-game
      */
-    public void scanForEmptyCells() {
-        for (int i = 0; i < poolSize; i++) {
-            for (int j = 0; j < poolSize; j++) {
-                if (cells[i][j].isChecked()) {
-                    if (j >= 1 && cells[i][j - 1].isEmpty()) cells[i][j - 1].checkCell();
-                    if (j <= limit && cells[i][j + 1].isEmpty()) cells[i][j + 1].checkCell();
-                    if (i >= 1 && cells[i - 1][j].isEmpty()) cells[i - 1][j].checkCell();
-                    if (i <= limit && cells[i + 1][j].isEmpty()) cells[i + 1][j].checkCell();
-                    if (i >= 1 && j >= 1 && cells[i - 1][j - 1].isEmpty()) cells[i - 1][j - 1].checkCell();
-                    if (i <= limit && j <= limit && cells[i + 1][j + 1].isEmpty()) cells[i + 1][j + 1].checkCell();
-                    if (i >= 1 && j <= limit && cells[i - 1][j + 1].isEmpty()) cells[i - 1][j + 1].checkCell();
-                    if (i <= limit && j >= 1 && cells[i + 1][j - 1].isEmpty()) cells[i + 1][j - 1].checkCell();
-                }
+    protected void scanCells(Point p) {
+        if (cells[p.x][p.y].isChecked()) {
+            return;
+        }
+        cells[p.x][p.y].setChecked(true);
+        cells[p.x][p.y].reveal();
+        incrementScore(1);
+        decremqCells(1);
+
+        if (cells[p.x][p.y].getVal() != 0) {
+            return;
+        }
+
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+
+                Point p1 = new Point(p.x + i, p.y + j);
+                if (inLimit(p1))
+                    scanCells(p1);
             }
         }
+
+    }
+
+    /**
+     * @param p
+     * @return
+     */
+    private boolean inLimit(Point p) {
+        return (p.x >= 0 && p.x < poolSize && p.y >= 0 && p.y < poolSize);
+    }
+
+    /**
+     * @param id
+     * @return
+     */
+    public Point getCellLoc(int id) {
+        int startId = cells[0][0].getCellID();
+        int i, j;
+        int dif = id - startId;
+        i = dif / poolSize;
+        j = dif % poolSize;
+        return new Point(i, j);
     }
 
     /**

@@ -19,8 +19,7 @@ public class Cell implements ActionListener {
         button.setMargin(new Insets(0, 0, 0, 0));
     }
 
-    public void disable()
-    {
+    public void disable() {
         button.removeActionListener(this);
     }
 
@@ -115,19 +114,20 @@ public class Cell implements ActionListener {
      *
      */
     public void checkCell() {
-        pool.decremqCells(1);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
         displayValue();
-        isChecked = true;
+
         if (val == 0) {
-            pool.scanForEmptyCells();
+            pool.scanCells(pool.getCellLoc(getCellID()));
             pool.incrementScore(1);
             return;
         }
         if (val == -1) {
             pool.fail();
         }
+
+        pool.decremqCells(1);
         pool.incrementScore(val);
     }
 
